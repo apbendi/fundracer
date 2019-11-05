@@ -3,6 +3,7 @@ const devParams = require("../dev-params");
 const ERC20ABI = require("./helpers/erc20-abi");
 const truffleAssert = require("truffle-assertions");
 const assertRevert = truffleAssert.reverts;
+const assertEmitted = truffleAssert.eventEmitted;
 
 contract("FundRace", accounts => {
 
@@ -47,7 +48,14 @@ contract("FundRace", accounts => {
     });
 
     it("should let the donor make an approved, designated donation", async () => {
-        await instance.makeDonation(donation1Amount, devParams.racer1, {from: devParams.donor1});
+        let result = await instance.makeDonation(donation1Amount, devParams.racer1, {from: devParams.donor1});
+
+        assertEmitted(result, 'Donation', (event) => {
+            return event.donor === devParams.donor1 &&
+                    event.racer === devParams.racer1 &&
+                    event.amount.toString(10) === donation1Amount;
+        }, "Failed to emit Donation event");
+
         let contractBalance = await token.methods.balanceOf(instance.address).call();
         assert.equal(contractBalance, donation1Amount, "Failed to tranfer donation to contract");
     });

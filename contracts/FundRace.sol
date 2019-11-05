@@ -8,6 +8,8 @@ contract FundRace {
     address public racer2;
     IERC20 public donationToken;
 
+    event Donation(address indexed donor, address indexed racer, uint256 indexed amount);
+
     constructor(
                 address _racer1,
                 address _racer2,
@@ -29,6 +31,8 @@ contract FundRace {
             donationToken.transferFrom(msg.sender, address(this), _amount),
             "FundRace - Transfer Failed"
             );
+
+        emit Donation(msg.sender, _designation, _amount);
     }
 
     modifier isRacer(address _addr) {
