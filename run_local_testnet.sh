@@ -6,4 +6,6 @@ if [[ -z "$ETH_MAINNET_NODE" ]] ; then
 fi
 
 MNEMONIC=('truly always spare panther raw room inch main object argue token sibling')
-ganache-cli --mnemonic "${MNEMONIC[@]}" --fork $ETH_MAINNET_NODE
+DAI_HOLDER="0xd580D07e01fb01149A54eb547f6A8806757B24e0"
+
+ganache-cli --mnemonic "${MNEMONIC[@]}" --fork $ETH_MAINNET_NODE --unlock $DAI_HOLDER

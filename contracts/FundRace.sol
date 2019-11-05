@@ -23,4 +23,16 @@ contract FundRace {
         racer2 = _racer2;
         donationToken = IERC20(_donationTokenAddr);
     }
+
+    function makeDonation(uint256 _amount, address _designation) public isRacer(_designation) {
+        require(
+            donationToken.transferFrom(msg.sender, address(this), _amount),
+            "FundRace - Transfer Failed"
+            );
+    }
+
+    modifier isRacer(address _addr) {
+        require(_addr == racer1 || _addr == racer2, "FundRace - Not Racer");
+        _;
+    }
 }
