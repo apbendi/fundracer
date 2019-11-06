@@ -14,7 +14,11 @@ module.exports = function (web3) {
                 throw new Error("Must provide web3 context first time dev-params is loaded");
             }
 
-            let block = await web3.eth.getBlock('latest');
+            let block = await web3.eth.getBlock('latest', false, (error) => {
+                                                                            if (error) {
+                                                                                throw error;
+                                                                            }
+                                                                        });
             startTimestamp = block.timestamp;
         }
 

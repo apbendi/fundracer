@@ -7,6 +7,10 @@ module.exports = function (web3) {
             method: "evm_increaseTime",
             params: [seconds],
             id: 0,
+        }, (error) => {
+            if (error) {
+                throw error;
+            }
         });
     }
 
