@@ -32,7 +32,7 @@ contract FundRace {
         donationToken = IERC20(_donationTokenAddr);
     }
 
-    function makeDonation(uint256 _amount, address _designation) public isRacer(_designation) {
+    function makeDonation(uint256 _amount, address _designation) public isRacer(_designation) isBeforeEnd() {
 
         designations[_designation] += _amount;
 
@@ -50,6 +50,11 @@ contract FundRace {
 
     modifier isRacer(address _addr) {
         require(_addr == racer1 || _addr == racer2, "FundRace - Not Racer");
+        _;
+    }
+
+    modifier isBeforeEnd() {
+        require(now < endDate, "FundRace - Past End Date");
         _;
     }
 }

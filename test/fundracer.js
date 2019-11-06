@@ -100,7 +100,16 @@ contract("FundRace", accounts => {
         assert.equal(racer2Designations, donation2Amount, "Invalid racer2 balance");
     });
 
-    it("should jump into the future", async () => {
+    it("should jump the test chain past the end date", async () => {
         await timeHelpers.jumpToTime(devParams.endDate + 10);
+    });
+
+    it("should not allow further donations after the end date", async () => {
+        let approveResult = await token.methods.approve(instance.address, donation2Amount).send({from: devParams.donor2});
+        assert(approveResult.status, "Failed to approve transfer");
+
+        let donationPromise = instance.makeDonation(donation2Amount, devParams.racer2, {from: devParams.donor2});
+
+        await assertRevert(donationPromise, "FundRace - Past End Date");
     });
 });
