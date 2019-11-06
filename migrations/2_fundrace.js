@@ -1,14 +1,16 @@
 const FundRace = artifacts.require("FundRace");
-const devParams = require("../dev-params");
+const generateParams = require("../dev-params")(web3);
 
-module.exports = function(deployer, network) {
+module.exports = async function(deployer, network) {
+
+    let devParams = await generateParams();
 
     if ('development' === network) {
-        deployer.deploy(FundRace,
-                        devParams.racer1,
-                        devParams.racer2,
-                        devParams.endDate,
-                        devParams.tokenAddr);
+        await deployer.deploy(FundRace,
+                                devParams.racer1,
+                                devParams.racer2,
+                                devParams.endDate,
+                                devParams.tokenAddr);
     } else {
         throw new Error("Unknown Network: " + network);
     }

@@ -1,14 +1,16 @@
 const FundRace = artifacts.require("FundRace");
-const devParams = require("../dev-params");
+const generateParams = require("../dev-params")();
 const ERC20ABI = require("./helpers/erc20-abi");
 const truffleAssert = require("truffle-assertions");
 const assertRevert = truffleAssert.reverts;
 const assertEmitted = truffleAssert.eventEmitted;
+const timeHelpers = require("./helpers/time-helpers")(web3);
 
 contract("FundRace", accounts => {
 
     var instance = null;
     var token = null;
+    var devParams = null;
 
     let utils = web3.utils;
     let donation1Amount = utils.toWei('100', 'ether');
@@ -16,6 +18,8 @@ contract("FundRace", accounts => {
     let totalDonation = utils.toWei('180', 'ether');
 
     before(async () => {
+        devParams = await generateParams();
+
         instance = await FundRace.deployed();
         token = new web3.eth.Contract(ERC20ABI, devParams.tokenAddr);
 
@@ -94,5 +98,9 @@ contract("FundRace", accounts => {
 
         assert.equal(racer1Designations, donation1Amount, "Invalid racer1 balance");
         assert.equal(racer2Designations, donation2Amount, "Invalid racer2 balance");
+    });
+
+    it("should jump into the future", async () => {
+        await timeHelpers.jumpToTime(devParams.endDate + 10);
     });
 });
