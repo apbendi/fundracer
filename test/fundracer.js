@@ -31,10 +31,12 @@ contract("FundRace", accounts => {
     it("should deploy with the correct initalization parameters", async () => {
         let racer1 = await instance.racer1();
         let racer2 = await instance.racer2();
+        let endDate = await instance.endDate();
         let donationToken = await instance.donationToken();
 
         assert.equal(racer1, devParams.racer1, "Incorrect racer1 deployed");
         assert.equal(racer2, devParams.racer2, "Incorrect racer2 deployed");
+        assert.equal(endDate, devParams.endDate, "Incorrect end date deployed");
         assert.equal(donationToken, token.options.address, "Incorrect token deployed");
     });
 
