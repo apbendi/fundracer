@@ -59,4 +59,11 @@ contract("FundRace", accounts => {
         let contractBalance = await token.methods.balanceOf(instance.address).call();
         assert.equal(contractBalance, donation1Amount, "Failed to tranfer donation to contract");
     });
+
+    it("should reflect the correct designations for each racer", async () => {
+        let {racer1Designations, racer2Designations} = await instance.getDesignations();
+
+        assert.equal(racer1Designations, donation1Amount, "Invalid racer1 balance");
+        assert.equal(racer2Designations, 0, "Invalid racer2 balance");
+    });
 });

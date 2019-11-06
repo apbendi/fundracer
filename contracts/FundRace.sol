@@ -8,6 +8,8 @@ contract FundRace {
     address public racer2;
     IERC20 public donationToken;
 
+    mapping(address => uint256) designations;
+
     event Donation(address indexed donor, address indexed racer, uint256 indexed amount);
 
     constructor(
@@ -27,12 +29,19 @@ contract FundRace {
     }
 
     function makeDonation(uint256 _amount, address _designation) public isRacer(_designation) {
+
+        designations[_designation] += _amount;
+
         require(
             donationToken.transferFrom(msg.sender, address(this), _amount),
             "FundRace - Transfer Failed"
             );
 
         emit Donation(msg.sender, _designation, _amount);
+    }
+
+    function getDesignations() public view returns(uint256 racer1Designations, uint256 racer2Designations) {
+        return (designations[racer1], designations[racer2]);
     }
 
     modifier isRacer(address _addr) {
