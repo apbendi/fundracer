@@ -12,14 +12,20 @@ contract("FundRace", accounts => {
 
     let utils = web3.utils;
     let donation1Amount = utils.toWei('100', 'ether');
+    let donation2Amount = utils.toWei('80', 'ether');
+    let totalDonation = utils.toWei('180', 'ether');
 
     before(async () => {
         instance = await FundRace.deployed();
         token = new web3.eth.Contract(ERC20ABI, devParams.tokenAddr);
 
         let stealAmount = utils.toWei('10000', 'ether');
-        let stealResult = await token.methods.transfer(devParams.donor1, stealAmount).send({from: devParams.daiHolder});
-        assert(stealResult.status, "Failed to steal Dai for donor");
+
+        let stealResult1 = await token.methods.transfer(devParams.donor1, stealAmount).send({from: devParams.daiHolder});
+        assert(stealResult1.status, "Failed to steal Dai for donor");
+
+        let stealResult2 = await token.methods.transfer(devParams.donor2, stealAmount).send({from: devParams.daiHolder});
+        assert(stealResult2.status, "Failed to steal Dai for donor");
     });
 
     it("should deploy with the correct initalization parameters", async () => {
@@ -65,5 +71,26 @@ contract("FundRace", accounts => {
 
         assert.equal(racer1Designations, donation1Amount, "Invalid racer1 balance");
         assert.equal(racer2Designations, 0, "Invalid racer2 balance");
+    });
+
+    it("should let another donor approve and make a donation", async () => {
+        let approveResult = await token.methods.approve(instance.address, donation2Amount).send({from: devParams.donor2});
+        assert(approveResult.status, "Failed to approve transfer");
+
+        let donationResult = await instance.makeDonation(donation2Amount, devParams.racer2, {from: devParams.donor2});
+
+        assertEmitted(donationResult, 'Donation', (event) => {
+            return event.donor === devParams.donor2 &&
+                    event.racer === devParams.racer2 &&
+                    event.amount.toString(10) === donation2Amount;
+        }, "Failed to emit Donation event");
+
+        let contractBalance = await token.methods.balanceOf(instance.address).call();
+        assert.equal(contractBalance, totalDonation, "Failed to tranfer donation to contract");
+
+        let {racer1Designations, racer2Designations} = await instance.getDesignations();
+
+        assert.equal(racer1Designations, donation1Amount, "Invalid racer1 balance");
+        assert.equal(racer2Designations, donation2Amount, "Invalid racer2 balance");
     });
 });
