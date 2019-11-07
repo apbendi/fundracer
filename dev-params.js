@@ -1,6 +1,10 @@
 var startTimestamp = null;
 
-module.exports = function (web3) {
+module.exports = function (web3, hello) {
+
+    if(hello) {
+        console.log(hello);
+    }
 
     // All of this is done soley so we make no assumptions about the time on the
     // network in relation to time on the local machine. Multiple test cycles
@@ -22,6 +26,8 @@ module.exports = function (web3) {
             startTimestamp = block.timestamp;
         }
 
+        console.log("Generator: " + hello);
+
         return {
             daiHolder: "0xd580D07e01fb01149A54eb547f6A8806757B24e0",
             racer1: "0x471294BB791B2eb793Fe1c316359Fa9CB356268D",
@@ -29,7 +35,7 @@ module.exports = function (web3) {
             endDate: daysFrom(30, startTimestamp),
             donor1: "0x2bAacB68F59F36d67d25ECa8820aeF58F0808d55",
             donor2: "0x8509EDb28eae65fd5E0cD87074b5Bd90ecbD8955",
-            tokenAddr: "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359", // Dai (Sai)
+            tokenAddr: "0x6B175474E89094C44Da98b954EedeAC495271d0F", // Dai (MCD)
             otherAddr: "0xf5B9a2143408907966c28db50C117A33d92788C3",
         }
     }

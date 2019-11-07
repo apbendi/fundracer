@@ -1,5 +1,5 @@
 const FundRace = artifacts.require("FundRace");
-const generateParams = require("../dev-params")();
+const generateParams = require("../dev-params")(undefined, "fundracer.js");
 const ERC20ABI = require("./helpers/erc20-abi");
 const truffleAssert = require("truffle-assertions");
 const assertRevert = truffleAssert.reverts;

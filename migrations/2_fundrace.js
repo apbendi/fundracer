@@ -1,5 +1,5 @@
 const FundRace = artifacts.require("FundRace");
-const generateParams = require("../dev-params")(web3);
+const generateParams = require("../dev-params")(web3, "migration");
 
 module.exports = async function(deployer, network) {
 
