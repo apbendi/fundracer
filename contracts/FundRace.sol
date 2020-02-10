@@ -53,24 +53,14 @@ contract FundRace {
         hasWithdrawnFlags[msg.sender] = true;
 
         (uint256 racer1Designations, uint256 racer2Designations) = getDesignations();
+        (uint256 racer1Take, uint256 racer2Take) = calculateSplits(racer1Designations, racer2Designations);
 
-        if (racer1Designations == racer2Designations) {
-            donationToken.transfer(msg.sender, racer1Designations);
-            return;
-        }
-
-        uint256 totalDonations = racer1Designations + racer2Designations;
-        uint256 losersTake = totalDonations / 5;            // 20%
-        uint256 winnersTake = totalDonations - losersTake;  // 80%
-
-        bool isWinner = (msg.sender == racer1 && (racer1Designations > racer2Designations)) ||
-                            (msg.sender == racer2 && (racer2Designations > racer1Designations));
         uint256 sendersTake;
 
-        if (isWinner) {
-            sendersTake = winnersTake;
+        if (msg.sender == racer1) {
+            sendersTake = racer1Take;
         } else {
-            sendersTake = losersTake;
+            sendersTake = racer2Take;
         }
 
         donationToken.transfer(msg.sender, sendersTake);
@@ -78,6 +68,27 @@ contract FundRace {
 
     function getDesignations() public view returns(uint256 racer1Designations, uint256 racer2Designations) {
         return (designations[racer1], designations[racer2]);
+    }
+
+    function calculateSplits(uint256 _racer1Designations,
+                             uint256 _racer2Designations) public
+                                                          pure
+                                                          returns(uint256 racer1Take,
+                                                                  uint256 racer2Take)
+    {
+        if (_racer1Designations == _racer2Designations) {
+            return (_racer1Designations, _racer2Designations);
+        }
+
+        uint256 totalDonations = _racer1Designations + _racer2Designations;
+        uint256 losersTake = totalDonations / 5;            // 20%
+        uint256 winnersTake = totalDonations - losersTake;  // 80%
+
+        if (_racer1Designations > _racer2Designations) {
+            return (winnersTake, losersTake);
+        } else {
+            return (losersTake, winnersTake);
+        }
     }
 
     modifier isRacer(address _addr) {
