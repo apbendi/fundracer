@@ -116,4 +116,74 @@ contract("FundRace Splits", _accounts => {
         assertWeiEqualAmount(racer1Take, 0.00001);
         assertWeiEqualAmount(racer2Take, 1000000);
     });
+
+    it("should handle a 100/0 split when donations are tiny", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("5", "0");
+
+        assert.equal(racer1Take.toString(10), "5");
+        assert.equal(racer2Take.toString(10), "0");
+    });
+
+    it("should handle a 0/100 split when donations are tiny", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("0", "5");
+
+        assert.equal(racer1Take.toString(10), "0");
+        assert.equal(racer2Take.toString(10), "5");
+    });
+
+    it("should handle an 80/20 split when donations are tiny", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("8", "2");
+
+        assert.equal(racer1Take.toString(10), "8");
+        assert.equal(racer2Take.toString(10), "2");
+    });
+
+    it("should handle an 20/80 split when donations are tiny", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("2", "8");
+
+        assert.equal(racer1Take.toString(10), "2");
+        assert.equal(racer2Take.toString(10), "8");
+    });
+
+    it("should handle a split where there is integer rounding", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(1), "1000000000000000433");
+
+        assert.equal(racer1Take.toString(10), "400000000000000086", "Failed to handle integer division for loser");
+        assert.equal(racer2Take.toString(10), "1600000000000000347", "Failed to handle integer division for winner");
+    });
+
+    it("should handle another split where there is integer rounding", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("500000000000000899", weiify(0.5));
+
+        assert.equal(racer1Take.toString(10), "800000000000000720", "Failed to handle integer division for loser");
+        assert.equal(racer2Take.toString(10), "200000000000000179", "Failed to handle integer division for winner");
+    });
+
+    it("should handle a split when donations are tiny", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("13", "12");
+
+        assert.equal(racer1Take.toString(10), "20");
+        assert.equal(racer2Take.toString(10), "5");
+    });
+
+    it("should handle another split when donations are tiny", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("3", "7");
+
+        assert.equal(racer1Take.toString(10), "2");
+        assert.equal(racer2Take.toString(10), "8");
+    });
+
+    it("should handle a split when donations are tiny and their is integer rounding", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("2", "5");
+
+        assert.equal(racer1Take.toString(10), "1");
+        assert.equal(racer2Take.toString(10), "6");
+    });
+
+    it("should handle another split when donations are tiny and their is integer rounding", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits("13", "11");
+
+        assert.equal(racer1Take.toString(10), "20");
+        assert.equal(racer2Take.toString(10), "4");
+    });
 });
