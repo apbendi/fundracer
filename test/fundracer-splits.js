@@ -25,6 +25,14 @@ contract("FundRace Splits", _accounts => {
         assert.equal(racer2Take.toString(10), "0", "Unexpected Racer2 Take");
     });
 
+    it("should return a 50/50 split when there is an exact tie", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(50), weiify(50));
+
+        assertWeiEqualAmount(racer1Take, 50);
+        assertWeiEqualAmount(racer2Take, 50);
+        assert.equal(racer1Take.toString(10), racer2Take.toString(10), "50/50 split not equal");
+    });
+
     it("should return an 80/20 split when the designations were 80/20", async () => {
         let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(80), weiify(20));
 
@@ -32,10 +40,38 @@ contract("FundRace Splits", _accounts => {
         assertWeiEqualAmount(racer2Take, 20);
     });
 
-    it("should return an 20/80 split when the designations were 20/80", async () => {
+    it("should return a 20/80 split when the designations were 20/80", async () => {
         let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(20), weiify(80));
 
         assertWeiEqualAmount(racer1Take, 20);
         assertWeiEqualAmount(racer2Take, 80);
+    });
+
+    it("should return an 80/20 split when the designations were 70/30", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(140), weiify(60));
+
+        assertWeiEqualAmount(racer1Take, 160);
+        assertWeiEqualAmount(racer2Take, 40);
+    });
+
+    it("should return a 20/80 split when the designations were 30/70", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(60), weiify(140));
+
+        assertWeiEqualAmount(racer1Take, 40);
+        assertWeiEqualAmount(racer2Take, 160);
+    });
+
+    it("should return an 80/20 split when one racer has a small fraction more", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(1000.000001), weiify(1000));
+
+        assertWeiEqualAmount(racer1Take, 1600.0000008);
+        assertWeiEqualAmount(racer2Take,  400.0000002);
+    });
+
+    it("should return an 20/80 split when one racer has a small fraction more", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(1000), weiify(1000.000001));
+
+        assertWeiEqualAmount(racer1Take,  400.0000002);
+        assertWeiEqualAmount(racer2Take, 1600.0000008);
     });
 });
