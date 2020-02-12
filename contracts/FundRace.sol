@@ -83,8 +83,12 @@ contract FundRace {
         uint256 totalDonations = _racer1Designations + _racer2Designations;
         uint256 losersTake = totalDonations / 5;            // 20%
         uint256 winnersTake = totalDonations - losersTake;  // 80%
+        bool loserFailedToReachThreshold = ( (_racer1Designations < losersTake) ||
+                                                (_racer2Designations < losersTake) );
 
-        if (_racer1Designations > _racer2Designations) {
+        if (loserFailedToReachThreshold) {
+            return (_racer1Designations, _racer2Designations);
+        } else if (_racer1Designations > _racer2Designations) {
             return (winnersTake, losersTake);
         } else {
             return (losersTake, winnersTake);

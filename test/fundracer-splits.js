@@ -74,4 +74,46 @@ contract("FundRace Splits", _accounts => {
         assertWeiEqualAmount(racer1Take,  400.0000002);
         assertWeiEqualAmount(racer2Take, 1600.0000008);
     });
+
+    it("should return a 100/0 split when one racer receives zero designations", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(10), weiify(0));
+
+        assertWeiEqualAmount(racer1Take, 10);
+        assertWeiEqualAmount(racer2Take, 0);
+    });
+
+    it("should return a 0/100 split when one racer receives zero designations", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(0), weiify(10));
+
+        assertWeiEqualAmount(racer1Take, 0);
+        assertWeiEqualAmount(racer2Take, 10);
+    });
+
+    it("should return a 90/10 split when that is the proportion of designations", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(90), weiify(10));
+
+        assertWeiEqualAmount(racer1Take, 90);
+        assertWeiEqualAmount(racer2Take, 10);
+    });
+
+    it("should return a 10/90 split when that is the proportion of designations", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(10), weiify(90));
+
+        assertWeiEqualAmount(racer1Take, 10);
+        assertWeiEqualAmount(racer2Take, 90);
+    });
+
+    it("should return an proportional split when one racer dominates the other", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(10000), weiify(0.001));
+
+        assertWeiEqualAmount(racer1Take, 10000);
+        assertWeiEqualAmount(racer2Take, 0.001);
+    });
+
+    it("should return an proportional split when one racer dominates the other", async () => {
+        let {racer1Take, racer2Take} = await instance.calculateSplits(weiify(0.00001), weiify(1000000));
+
+        assertWeiEqualAmount(racer1Take, 0.00001);
+        assertWeiEqualAmount(racer2Take, 1000000);
+    });
 });
